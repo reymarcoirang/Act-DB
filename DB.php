@@ -1,6 +1,6 @@
 <?php
 
-    class DB{
+    class db{
         //Properties
         private $host = 'localhost';
         private $user = 'root';
