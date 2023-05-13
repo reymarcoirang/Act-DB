@@ -15,7 +15,7 @@
             $sql = "SELECT * FROM tblcustomer WHERE id =" . $_GET['id'];
         }
 
-        $db = new DB();
+        $db = new db();
         //Connect Database
         $connect = $db->connect();
         //Execute Query
