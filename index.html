@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" integrity="sha512-SgaqKKxJDQ/tAUAAXzvxZz33rmn7leYDYfBP+YoMRSENhf3zJyx3SBASt/OfeQwBHA1nxMis7mM3EV/oYT6Fdw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+  <body class="bg-light">
+    <div class="container">
+      <h1>Customer Information</h1>
+      <form method="post">
+        <div class="form-row">
+          <div class="col-md-4 mb-3">
+            <label for="studno">Student ID</label>
+            <input type="text" class="form-control" name="studno" id="studno" placeholder="" readonly>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="first_name">First name</label>
+            <input type="text" class="form-control" name="first_name" id="first_name" placeholder="First name" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="last_name">Last name</label>
+            <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last name" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="add_ress">Address</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="add_ress" id="add_ress" placeholder="Address" required>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="add_record()">Add Customer</button>
+        <button type="reset" class="btn btn-primary">Clear</button>
+      </form>
+      <hr class="my-5">
+      <h3 class="mb-5">Customer Table</h3>
+      <p class="lead">
+        NOTE:BEFORE YOU UPDATE AND DELETE DATA, NEED TO SELECT IN TABLE.
+      </p>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="customer">
+
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-end gap-3">
+        <form action="index.html" method="post">
+          <button class="btn btn-success " type="submit" onclick="update_record()">Update</button>
+          <button class="btn btn-danger " onclick="delete_record()" type="submit">Delete</button>
+        </form>
+      </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.js" integrity="sha512-6DC1eE3AWg1bgitkoaRM1lhY98PxbMIbhgYCGV107aZlyzzvaWCW1nJW2vDuYQm06hXrW0As6OGKcIaAVWnHJw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js" integrity="sha512-wOLiP6uL5tNrV1FiutKtAyQGGJ1CWAsqQ6Kp2XZ12/CvZxw8MvNJfdhh0yTwjPIir4SWag2/MHrseR7PRmNtvA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      $(document).ready(function() {
+          $.ajax({
+              url: "http://act-db.test/",
+              method: "GET", 
+              success: function(response) {
+                  txt = "";
+                  for(var item of response){
+                      txt += 
+                      `
+                      <tr>
+                          <th scope="row">${item.id}</th>
+                          <td>${item.first_name}</td>
+                          <td>${item.last_name}</td>
+                          <td>${item.add_ress}</td>
+                          <td>
+                            <button class="btn btn-outline-dark btn-sm" onclick="select_record(${item.id})">Select</button>
+                          </td>
+                      </tr>
+                      
+                      `;
+                      document.getElementById("customer").innerHTML = txt;
+                  }
+              },
+              error: function(xhr, status, error) {
+                  var err = eval("(" + xhr.responseText + ")");                    
+                  alert(err.Message);
+              }
+          })
+      });
+
+      function add_record() {
+            var values = {
+                first_name : document.getElementById("first_name").value,
+                last_name : document.getElementById("last_name").value,
+                add_ress : document.getElementById("add_ress").value,
+            }
+            $(document).ready(function() {
+                  $.ajax({
+                      url: "http://act-db.test/",
+                      method: "POST",
+                      data: JSON.stringify(values),
+                      success: function(response) {
+                          console.log(JSON.stringify(values))
+                      },
+                      error: function(xhr, status, error) {
+                          var err = eval("(" + xhr.responseText + ")");                    
+                          console.log(err.Message);
+                      }
+                  });
+                })
+        }
+        
+      function select_record(id) {
+            $.ajax({
+                url: `http://act-db.test/index.php?id=${id}`,
+                method: "GET",
+                success: function(response) {
+                  for(var item of response){
+                    document.getElementById("studno").value = item.id;
+                    document.getElementById("first_name").value = item.first_name;
+                    document.getElementById("last_name").value = item.last_name;
+                    document.getElementById("add_ress").value = item.add_ress;
+
+                  }
+                },
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");                    
+                    console.log(err.Message);
+                }
+            });
+        }
+
+        function update_record(){
+          var studno = document.getElementById("studno").value
+          var values = {
+                first_name : document.getElementById("first_name").value,
+                last_name : document.getElementById("last_name").value,
+                add_ress : document.getElementById("add_ress").value,
+          }
+          $.ajax({
+              url: `http://act-db.test/index.php?id=${studno}`,
+              method: "PUT",
+              data: JSON.stringify(values),
+              success: function(response) {
+                  
+              },
+              error: function(xhr, status, error) {
+                  var err = eval("(" + xhr.responseText + ")");                    
+                  console.log(err.Message);
+              }
+          });
+      }
+
+        function delete_record() {
+            var studno = document.getElementById("studno").value
+            $(document).ready(function() {
+                  $.ajax({
+                      url: `http://act-db.test/index.php?id=${studno}`,
+                      method: "DELETE",
+                      success: function(response) {
+                          console.log(JSON.stringify(values))
+                      },
+                      error: function(xhr, status, error) {
+                          var err = eval("(" + xhr.responseText + ")");                    
+                          console.log(err.Message);
+                      }
+                  });
+                })
+        }
+    </script>
+  </body>
+</html>
